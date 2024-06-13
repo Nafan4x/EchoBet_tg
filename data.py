@@ -226,6 +226,7 @@ def delete_record(table_name, pk):
 def create_table():
     if conn is not None:
         try:
+            # Chats
             with conn.cursor() as curs:
                 create_table_query = """
                 CREATE TABLE IF NOT EXISTS Chats (
@@ -238,6 +239,7 @@ def create_table():
                 curs.execute(create_table_query)
                 conn.commit()
 
+            # tg_actions
             with conn.cursor() as curs:
                 create_table_query = """
                 CREATE TABLE IF NOT EXISTS tg_actions (
@@ -248,6 +250,7 @@ def create_table():
                 curs.execute(create_table_query)
                 conn.commit()
 
+            # Keys
             with conn.cursor() as curs:
                 create_table_query = """
                 CREATE TABLE IF NOT EXISTS Keys (
@@ -263,6 +266,7 @@ def create_table():
                 curs.execute(create_table_query)
                 conn.commit()
 
+            # Bots
             with conn.cursor() as curs:
                 create_table_query = """
                 CREATE TABLE IF NOT EXISTS Bots (
@@ -284,24 +288,7 @@ def create_table():
 
 
 def make_migrations():
-    if conn is not None:
-        try:
-            with conn.cursor() as curs:
-                curs.execute("""
-                    SELECT column_name
-                    FROM information_schema.columns
-                    WHERE table_name='chats' AND column_name='is_follow';
-                """)
-
-                if not curs.fetchone():
-                    add_column_query = """
-                    ALTER TABLE Chats
-                    ADD COLUMN is_follow BOOLEAN DEFAULT FALSE;
-                    """
-                    curs.execute(add_column_query)
-                    conn.commit()
-        except Exception as e:
-            print(f"An error occurred while creating the table: {e}")
+    pass
 
 
 def read_table(table_name):
@@ -355,7 +342,7 @@ def get_editable_keys(chat_id):
 def main():
     create_table()
     # create_keys(234223123)
-    print(get_editable_keys(234223123))
+    # print(get_editable_keys(234223123))
     conn.close()
 
 
