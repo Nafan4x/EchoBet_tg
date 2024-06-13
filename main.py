@@ -2,6 +2,7 @@ import config
 import telebot
 import profile
 import random
+from data import *
 
 from telebot import types
 bot = telebot.TeleBot(config.TOKEN)
@@ -18,7 +19,9 @@ def welcome(message):
     bot.send_message(message.chat.id,
         "Добро пожаловать, воспользуйтесь кнопками для навигации",
         parse_mode='html', reply_markup=markup)
-
+    table = read_table('chats')
+    for user in table:
+        if user['chat_id'] == message.chat.id:
 
 @bot.message_handler(content_types=['text'])
 def chater(message):

@@ -166,7 +166,7 @@ def main():
     create_table()
     make_migrations()
     # print(read_table('chats'))
-    create_chats(234223123, 'bylygeme', 23123)
+    #create_chats(234223123, 'bylygeme', 23123)
     conn.close()
 
 
