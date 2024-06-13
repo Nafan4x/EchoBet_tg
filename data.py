@@ -155,8 +155,7 @@ def read_table(table_name):
                 all_users = curs.fetchall()
 
                 users_list = [dict(zip(column_names, row)) for row in all_users]
-                users_json = json.dumps(users_list, default=json_serial, indent=4)
-                return users_json
+                return users_list  # Возвращаем список словарей вместо строки JSON
         except Exception as e:
             print(f"An error occurred while reading the table: {e}")
             return None
