@@ -69,6 +69,56 @@ def update_actions(chat_id, action=None):
             print(f"An error occurred while updating the record: {e}")
 
 
+def update_keys(key_id, base_key=None, secret_key=None, key_name=None, bourse=None):
+    if conn is not None:
+        try:
+            with conn.cursor() as curs:
+                updates = []
+                params = []
+                if base_key is not None:
+                    updates.append("base_key = %s")
+                    params.append(base_key)
+
+                if secret_key is not None:
+                    updates.append("secret_key = %s")
+                    params.append(secret_key)
+
+                if key_name is not None:
+                    updates.append("key_name = %s")
+                    params.append(key_name)
+
+                if bourse is not None:
+                    updates.append("bourse = %s")
+                    params.append(bourse)
+
+                if not updates:
+                    print("No fields to update")
+                    return
+
+                update_query = f"UPDATE keys SET {', '.join(updates)} WHERE key_id = %s"
+                params.append(key_id)
+
+                curs.execute(update_query, tuple(params))
+                conn.commit()
+                print("Record updated successfully")
+        except Exception as e:
+            print(f"An error occurred while updating the record: {e}")
+
+
+def create_chats(chat_id, username, balance, is_follow=False):
+    if conn is not None:
+        try:
+            with conn.cursor() as curs:
+                params = (chat_id, username, balance, is_follow,)
+                update_query = f"INSERT INTO chats(chat_id, username, balance, is_follow) VALUES (%s, %s, %s, %s);"
+
+                curs.execute(update_query, params)
+                conn.commit()
+                print("Record updated successfully")
+        except Exception as e:
+            print(f"An error occurred while updating the record: {e}")
+
+
 def create_actions(chat_id, action):
     if conn is not None:
         try:
@@ -83,12 +133,13 @@ def create_actions(chat_id, action):
             print(f"An error occurred while updating the record: {e}")
 
 
-def create_chats(chat_id, username, balance, is_follow=False):
+def create_keys(chat_id, base_key, secret_key, key_name, bourse):
     if conn is not None:
         try:
             with conn.cursor() as curs:
-                params = (chat_id, username, balance, is_follow,)
-                update_query = f"INSERT INTO chats(chat_id, username, balance, is_follow) VALUES (%s, %s, %s, %s);"
+                params = (chat_id, base_key, secret_key, key_name, bourse,)
+                update_query = f"INSERT INTO tg_actions (chat_id, base_key, secret_key, key_name, bourse) VALUES "\
+                               f"(%s, %s, %s, %s, %s);"
 
                 curs.execute(update_query, params)
                 conn.commit()
@@ -117,6 +168,21 @@ def create_table():
                 CREATE TABLE IF NOT EXISTS tg_actions (
                     chat_id SERIAL PRIMARY KEY,
                     action VARCHAR(50)
+                );
+                """
+                curs.execute(create_table_query)
+                conn.commit()
+
+            with conn.cursor() as curs:
+                create_table_query = """
+                CREATE TABLE IF NOT EXISTS Keys (
+                    key_id SERIAL PRIMARY KEY,
+                    chat_id INTEGER,
+                    base_key VARCHAR(100),
+                    secret_key VARCHAR(100),
+                    key_name VARCHAR(100),
+                    bourse VARCHAR(100),
+                    FOREIGN KEY (chat_id) REFERENCES Chats (chat_id)
                 );
                 """
                 curs.execute(create_table_query)
@@ -163,7 +229,6 @@ def read_table(table_name):
 
 def main():
     create_table()
-    make_migrations()
     # print(read_table('chats'))
     #create_chats(234223123, 'bylygeme', 23123)
     conn.close()
