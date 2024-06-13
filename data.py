@@ -73,24 +73,24 @@ def create_actions(chat_id, action):
     if conn is not None:
         try:
             with conn.cursor() as curs:
-                params = [chat_id, action]
-                update_query = f"INSERT INTO public.tg_actions (chat_id, action) VALUES (%s, %s);"
+                params = (chat_id, action,)
+                update_query = f"INSERT INTO tg_actions (chat_id, action) VALUES (%s, %s);"
 
-                curs.execute(update_query, tuple(params))
+                curs.execute(update_query, params)
                 conn.commit()
                 print("Record updated successfully")
         except Exception as e:
             print(f"An error occurred while updating the record: {e}")
 
 
-def create_chats(chat_id, username, balance):
+def create_chats(chat_id, username, balance, is_follow=False):
     if conn is not None:
         try:
             with conn.cursor() as curs:
-                params = [chat_id, username, balance]
-                update_query = f"INSERT INTO public.chats(chat_id, username, balance) VALUES (%s, %s, %s);"
+                params = (chat_id, username, balance, is_follow,)
+                update_query = f"INSERT INTO chats(chat_id, username, balance, is_follow) VALUES (%s, %s, %s, %s);"
 
-                curs.execute(update_query, tuple(params))
+                curs.execute(update_query, params)
                 conn.commit()
                 print("Record updated successfully")
         except Exception as e:
@@ -105,7 +105,8 @@ def create_table():
                 CREATE TABLE IF NOT EXISTS Chats (
                     chat_id SERIAL PRIMARY KEY,
                     username VARCHAR(50),
-                    balance INT
+                    balance INT,
+                    is_follow BOOLEAN DEFAULT FALSE
                 );
                 """
                 curs.execute(create_table_query)
@@ -120,6 +121,27 @@ def create_table():
                 """
                 curs.execute(create_table_query)
                 conn.commit()
+        except Exception as e:
+            print(f"An error occurred while creating the table: {e}")
+
+
+def make_migrations():
+    if conn is not None:
+        try:
+            with conn.cursor() as curs:
+                curs.execute("""
+                    SELECT column_name
+                    FROM information_schema.columns
+                    WHERE table_name='chats' AND column_name='is_follow';
+                """)
+
+                if not curs.fetchone():
+                    add_column_query = """
+                    ALTER TABLE Chats
+                    ADD COLUMN is_follow BOOLEAN DEFAULT FALSE;
+                    """
+                    curs.execute(add_column_query)
+                    conn.commit()
         except Exception as e:
             print(f"An error occurred while creating the table: {e}")
 
@@ -142,10 +164,9 @@ def read_table(table_name):
 
 def main():
     create_table()
+    make_migrations()
     # print(read_table('chats'))
-    # update_record(101000, username="bylygeme")
-    # print(read_table('chats'))
-    create_chats(2323123, 'bylygeme', 23123)
+    create_chats(234223123, 'bylygeme', 23123)
     conn.close()
 
 
