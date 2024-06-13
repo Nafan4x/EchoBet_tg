@@ -7,8 +7,8 @@ try:
                             password='123',
                             host='localhost',
                             )
-except:
-    print('Can`t establish connection to database')
+except Exception as exept:
+    print(f'Can`t establish connection to database. {exept}')
 
 tables_pk = {
     'chats': 'chat_id',
@@ -319,7 +319,7 @@ def read_table(table_name):
             return None
 
 
-def get_editable(chat_id):
+def get_editable_bots(chat_id):
     with conn.cursor() as curs:
         select_query = """
         SELECT *
@@ -336,10 +336,26 @@ def get_editable(chat_id):
         return
 
 
+def get_editable_keys(chat_id):
+    with conn.cursor() as curs:
+        select_query = """
+        SELECT *
+        FROM Keys
+        WHERE Keys.chat_id = %s;
+        """
+        curs.execute(select_query, (chat_id,))
+        bot_ids = curs.fetchall()
+
+        for i in bot_ids:
+            if None in i:
+                return i[0]
+        return
+
+
 def main():
     create_table()
-    #create_bots(1)
-    print(get_editable(234223123))
+    # create_keys(234223123)
+    print(get_editable_keys(234223123))
     conn.close()
 
 
