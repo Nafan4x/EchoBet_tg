@@ -3,7 +3,7 @@ from datetime import date, datetime
 import psycopg2
 
 try:
-    conn = psycopg2.connect(dbname='postgres',
+    conn = psycopg2.connect(dbname='EchoData',
                             user='postgres',
                             password='123',
                             host='localhost',
@@ -69,6 +69,34 @@ def update_actions(chat_id, action=None):
             print(f"An error occurred while updating the record: {e}")
 
 
+def create_actions(chat_id, action):
+    if conn is not None:
+        try:
+            with conn.cursor() as curs:
+                params = [chat_id, action]
+                update_query = f"INSERT INTO public.tg_actions (chat_id, action) VALUES (%s, %s);"
+
+                curs.execute(update_query, tuple(params))
+                conn.commit()
+                print("Record updated successfully")
+        except Exception as e:
+            print(f"An error occurred while updating the record: {e}")
+
+
+def create_chats(chat_id, username, balance):
+    if conn is not None:
+        try:
+            with conn.cursor() as curs:
+                params = [chat_id, username, balance]
+                update_query = f"INSERT INTO public.chats(chat_id, username, balance) VALUES (%s, %s, %s);"
+
+                curs.execute(update_query, tuple(params))
+                conn.commit()
+                print("Record updated successfully")
+        except Exception as e:
+            print(f"An error occurred while updating the record: {e}")
+
+
 def create_table():
     if conn is not None:
         try:
@@ -78,6 +106,16 @@ def create_table():
                     chat_id SERIAL PRIMARY KEY,
                     username VARCHAR(50),
                     balance INT
+                );
+                """
+                curs.execute(create_table_query)
+                conn.commit()
+
+            with conn.cursor() as curs:
+                create_table_query = """
+                CREATE TABLE IF NOT EXISTS tg_actions (
+                    chat_id SERIAL PRIMARY KEY,
+                    action VARCHAR(50)
                 );
                 """
                 curs.execute(create_table_query)
@@ -104,9 +142,10 @@ def read_table(table_name):
 
 def main():
     create_table()
-    print(read_table('chats'))
-    update_record(101000, username="bylygeme")
-    print(read_table('chats'))
+    # print(read_table('chats'))
+    # update_record(101000, username="bylygeme")
+    # print(read_table('chats'))
+    create_chats(2323123, 'bylygeme', 23123)
     conn.close()
 
 
