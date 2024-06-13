@@ -11,6 +11,12 @@ try:
 except:
     print('Can`t establish connection to database')
 
+tables_pk = {
+    'chats': 'chat_id',
+    'keys': 'key_id',
+    'tg_action': 'chat_id',
+}
+
 
 def json_serial(obj):
     if isinstance(obj, (datetime, date)):
@@ -114,7 +120,7 @@ def create_chats(chat_id, username, balance, is_follow=False):
 
                 curs.execute(update_query, params)
                 conn.commit()
-                print("Record updated successfully")
+                print("Record created successfully")
         except Exception as e:
             print(f"An error occurred while updating the record: {e}")
 
@@ -128,7 +134,7 @@ def create_actions(chat_id, action):
 
                 curs.execute(update_query, params)
                 conn.commit()
-                print("Record updated successfully")
+                print("Record created successfully")
         except Exception as e:
             print(f"An error occurred while updating the record: {e}")
 
@@ -143,7 +149,21 @@ def create_keys(chat_id, base_key, secret_key, key_name, bourse):
 
                 curs.execute(update_query, params)
                 conn.commit()
-                print("Record updated successfully")
+                print("Record created successfully")
+        except Exception as e:
+            print(f"An error occurred while updating the record: {e}")
+
+
+def delete_record(table_name, pk):
+    if conn is not None:
+        try:
+            with conn.cursor() as curs:
+                params = (pk,)
+                update_query = f"DELETE FROM {table_name} WHERE {tables_pk[table_name]}=%s;"
+
+                curs.execute(update_query, params)
+                conn.commit()
+                print("Record deleted successfully")
         except Exception as e:
             print(f"An error occurred while updating the record: {e}")
 
