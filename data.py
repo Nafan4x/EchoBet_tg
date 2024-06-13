@@ -1,4 +1,3 @@
-import json
 from datetime import date, datetime
 import psycopg2
 
@@ -195,7 +194,7 @@ def create_keys(chat_id, base_key, secret_key, key_name, bourse):
             print(f"An error occurred while updating the record: {e}")
 
 
-def create_bots(key_id, bot_name, symbol, side, reinvestment, size):
+def create_bots(key_id=None, bot_name=None, symbol=None, side=None, reinvestment=None, size=None):
     if conn is not None:
         try:
             with conn.cursor() as curs:
@@ -320,9 +319,28 @@ def read_table(table_name):
             return None
 
 
+def get_editable(chat_id):
+    with conn.cursor() as curs:
+        select_query = """
+        SELECT *
+        FROM Bots
+        JOIN Keys ON Bots.key_id = Keys.key_id
+        WHERE Keys.chat_id = %s;
+        """
+        curs.execute(select_query, (chat_id,))
+        bot_ids = curs.fetchall()
+
+        for i in bot_ids:
+            if None in i:
+                print(i[0])
+                return i[0]
+        return
+
+
 def main():
     create_table()
-    delete_record('bots', 3)
+    #create_bots(1)
+    get_editable(234223123)
     conn.close()
 
 
