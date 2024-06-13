@@ -151,7 +151,7 @@ def update_bots(bot_id, bot_name=None, symbol=None, side=None, reinvestment=None
             print(f"An error occurred while updating the record: {e}")
 
 
-def create_chats(chat_id, username=None, balance=None, is_follow=False):
+def create_chats(chat_id, username, balance=0, is_follow=False):
     if conn is not None:
         try:
             with conn.cursor() as curs:
@@ -165,7 +165,7 @@ def create_chats(chat_id, username=None, balance=None, is_follow=False):
             print(f"An error occurred while updating the record: {e}")
 
 
-def create_actions(chat_id, action=None):
+def create_actions(chat_id, action):
     if conn is not None:
         try:
             with conn.cursor() as curs:
