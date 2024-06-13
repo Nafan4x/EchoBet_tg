@@ -19,9 +19,9 @@ def welcome(message):
     bot.send_message(message.chat.id,
         "Добро пожаловать, воспользуйтесь кнопками для навигации",
         parse_mode='html', reply_markup=markup)
-    table = read_table('chats')
-    for user in table:
-        if user['chat_id'] == message.chat.id:
+    table = [i['chat_id'] for i in read_table('chats')]
+    if not(message.chat.id in table):
+        dobavit
 
 @bot.message_handler(content_types=['text'])
 def chater(message):
