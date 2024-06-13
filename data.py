@@ -15,6 +15,7 @@ tables_pk = {
     'chats': 'chat_id',
     'keys': 'key_id',
     'tg_action': 'chat_id',
+    'bots': 'bot_id',
 }
 
 
@@ -111,6 +112,46 @@ def update_keys(key_id, base_key=None, secret_key=None, key_name=None, bourse=No
             print(f"An error occurred while updating the record: {e}")
 
 
+def update_bots(bot_id, bot_name=None, symbol=None, side=None, reinvestment=None, size=None):
+    if conn is not None:
+        try:
+            with conn.cursor() as curs:
+                updates = []
+                params = []
+                if bot_name is not None:
+                    updates.append("bot_name = %s")
+                    params.append(bot_name)
+
+                if symbol is not None:
+                    updates.append("symbol = %s")
+                    params.append(symbol)
+
+                if side is not None:
+                    updates.append("side = %s")
+                    params.append(side)
+
+                if reinvestment is not None:
+                    updates.append("reinvestment = %s")
+                    params.append(reinvestment)
+
+                if size is not None:
+                    updates.append("size = %s")
+                    params.append(size)
+
+                if not updates:
+                    print("No fields to update")
+                    return
+
+                update_query = f"UPDATE bots SET {', '.join(updates)} WHERE bot_id = %s"
+                params.append(bot_id)
+
+                curs.execute(update_query, tuple(params))
+                conn.commit()
+                print("Record updated successfully")
+        except Exception as e:
+            print(f"An error occurred while updating the record: {e}")
+
+
 def create_chats(chat_id, username, balance, is_follow=False):
     if conn is not None:
         try:
@@ -144,8 +185,23 @@ def create_keys(chat_id, base_key, secret_key, key_name, bourse):
         try:
             with conn.cursor() as curs:
                 params = (chat_id, base_key, secret_key, key_name, bourse,)
-                update_query = f"INSERT INTO tg_actions (chat_id, base_key, secret_key, key_name, bourse) VALUES "\
+                update_query = f"INSERT INTO keys (chat_id, base_key, secret_key, key_name, bourse) VALUES "\
                                f"(%s, %s, %s, %s, %s);"
+
+                curs.execute(update_query, params)
+                conn.commit()
+                print("Record created successfully")
+        except Exception as e:
+            print(f"An error occurred while updating the record: {e}")
+
+
+def create_bots(key_id, bot_name, symbol, side, reinvestment, size):
+    if conn is not None:
+        try:
+            with conn.cursor() as curs:
+                params = (key_id, bot_name, symbol, side, reinvestment, size,)
+                update_query = f"INSERT INTO bots (key_id, bot_name, symbol, side, reinvestment, size) VALUES "\
+                               f"(%s, %s, %s, %s, %s, %s);"
 
                 curs.execute(update_query, params)
                 conn.commit()
@@ -159,13 +215,13 @@ def delete_record(table_name, pk):
         try:
             with conn.cursor() as curs:
                 params = (pk,)
-                update_query = f"DELETE FROM {table_name} WHERE {tables_pk[table_name]}=%s;"
+                update_query = f"DELETE FROM {table_name} WHERE {tables_pk[table_name]} = %s;"
 
                 curs.execute(update_query, params)
                 conn.commit()
                 print("Record deleted successfully")
         except Exception as e:
-            print(f"An error occurred while updating the record: {e}")
+            print(f"An error occurred while deleting the record: {e}")
 
 
 def create_table():
@@ -207,6 +263,23 @@ def create_table():
                 """
                 curs.execute(create_table_query)
                 conn.commit()
+
+            with conn.cursor() as curs:
+                create_table_query = """
+                CREATE TABLE IF NOT EXISTS Bots (
+                    bot_id SERIAL PRIMARY KEY,
+                    key_id INTEGER,
+                    bot_name VARCHAR(100),
+                    symbol VARCHAR(20),
+                    side VARCHAR(10),
+                    reinvestment INTEGER,
+                    size INTEGER,
+                    FOREIGN KEY (key_id) REFERENCES Keys (key_id)
+                );
+                """
+                curs.execute(create_table_query)
+                conn.commit()
+
         except Exception as e:
             print(f"An error occurred while creating the table: {e}")
 
@@ -249,8 +322,7 @@ def read_table(table_name):
 
 def main():
     create_table()
-    # print(read_table('chats'))
-    #create_chats(234223123, 'bylygeme', 23123)
+    delete_record('bots', 3)
     conn.close()
 
 
