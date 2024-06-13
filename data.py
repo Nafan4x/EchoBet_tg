@@ -151,7 +151,7 @@ def update_bots(bot_id, bot_name=None, symbol=None, side=None, reinvestment=None
             print(f"An error occurred while updating the record: {e}")
 
 
-def create_chats(chat_id, username, balance, is_follow=False):
+def create_chats(chat_id, username=None, balance=None, is_follow=False):
     if conn is not None:
         try:
             with conn.cursor() as curs:
@@ -165,7 +165,7 @@ def create_chats(chat_id, username, balance, is_follow=False):
             print(f"An error occurred while updating the record: {e}")
 
 
-def create_actions(chat_id, action):
+def create_actions(chat_id, action=None):
     if conn is not None:
         try:
             with conn.cursor() as curs:
@@ -179,7 +179,7 @@ def create_actions(chat_id, action):
             print(f"An error occurred while updating the record: {e}")
 
 
-def create_keys(chat_id, base_key, secret_key, key_name, bourse):
+def create_keys(chat_id, base_key=None, secret_key=None, key_name=None, bourse=None):
     if conn is not None:
         try:
             with conn.cursor() as curs:
@@ -194,7 +194,7 @@ def create_keys(chat_id, base_key, secret_key, key_name, bourse):
             print(f"An error occurred while updating the record: {e}")
 
 
-def create_bots(key_id=None, bot_name=None, symbol=None, side=None, reinvestment=None, size=None):
+def create_bots(key_id, bot_name=None, symbol=None, side=None, reinvestment=None, size=None):
     if conn is not None:
         try:
             with conn.cursor() as curs:
@@ -332,7 +332,6 @@ def get_editable(chat_id):
 
         for i in bot_ids:
             if None in i:
-                print(i[0])
                 return i[0]
         return
 
@@ -340,7 +339,7 @@ def get_editable(chat_id):
 def main():
     create_table()
     #create_bots(1)
-    get_editable(234223123)
+    print(get_editable(234223123))
     conn.close()
 
 
