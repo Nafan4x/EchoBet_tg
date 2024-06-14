@@ -332,9 +332,11 @@ def get_editable_bots(chat_id):
             LIMIT 1;
             """
             curs.execute(select_query, (chat_id,))
-            bot_ids = curs.fetchone()
+            column_names = [desc[0] for desc in curs.description]
+            bot_ids = curs.fetchall()
+            users_list = [dict(zip(column_names, row)) for row in bot_ids]
 
-            return bot_ids[0]
+            return users_list[0]
     except Exception as e:
         print(f"An error occurred while reading the table: {e}")
         return None
@@ -353,9 +355,11 @@ def get_editable_keys(chat_id):
             LIMIT 1;
             """
             curs.execute(select_query, (chat_id,))
-            bot_ids = curs.fetchone()
+            column_names = [desc[0] for desc in curs.description]
+            bot_ids = curs.fetchall()
 
-            return bot_ids[0]
+            users_list = [dict(zip(column_names, row)) for row in bot_ids]
+            return users_list[0]
     except Exception as e:
         print(f"An error occurred while reading the table: {e}")
         return None
