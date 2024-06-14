@@ -277,6 +277,7 @@ def create_table():
                     side VARCHAR(10),
                     reinvestment INTEGER,
                     size INTEGER,
+                    status VARCHAR(20),
                     FOREIGN KEY (key_id) REFERENCES Keys (key_id)
                 );
                 """
