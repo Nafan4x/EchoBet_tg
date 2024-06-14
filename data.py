@@ -327,15 +327,14 @@ def get_editable_bots(chat_id):
             SELECT *
             FROM Bots
             JOIN Keys ON Bots.key_id = Keys.key_id
-            WHERE Keys.chat_id = %s;
+            WHERE Keys.chat_id = %s
+            ORDER BY bit_id DESC
+            LIMIT 1;
             """
             curs.execute(select_query, (chat_id,))
-            bot_ids = curs.fetchall()
+            bot_ids = curs.fetchone()
 
-            for i in bot_ids:
-                if None in i:
-                    return i[0]
-            return
+            return bot_ids[0]
     except Exception as e:
         print(f"An error occurred while reading the table: {e}")
         return None
@@ -349,15 +348,14 @@ def get_editable_keys(chat_id):
             select_query = """
             SELECT *
             FROM Keys
-            WHERE Keys.chat_id = %s;
+            WHERE Keys.chat_id = %s
+            ORDER BY key_id DESC
+            LIMIT 1;
             """
             curs.execute(select_query, (chat_id,))
-            bot_ids = curs.fetchall()
+            bot_ids = curs.fetchone()
 
-            for i in bot_ids:
-                if None in i:
-                    return i[0]
-            return
+            return bot_ids[0]
     except Exception as e:
         print(f"An error occurred while reading the table: {e}")
         return None
@@ -369,7 +367,8 @@ def get_active_bots():
     try:
         with conn.cursor() as curs:
             select_query = """
-            SELECT * FROM Bots
+            SELECT bot_id, bot_name, symbol, side, reinvestment, size, status, base_key, secret_key FROM Bots
+            JOIN Keys ON Keys.key_id = Bots.key_id
             WHERE status = 'waiting';
             """
             curs.execute(select_query)
@@ -401,8 +400,9 @@ def get_actions(chat_id):
 def main():
     create_table()
     # print(get_actions(234223123))
-    # create_bots(1, bot_name='None', symbol='None', side='None', reinvestment=0, size=2, status='waiting')
-    print(get_active_bots())
+    # create_bots(1, bot_name='Goga3', symbol='BTCUSDT', side='Buy', reinvestment=0, size=50, status='waiting')
+    # print(get_active_bots())
+    print(get_editable_keys(234223123))
     conn.close()
 
 

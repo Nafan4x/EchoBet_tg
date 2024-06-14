@@ -1,5 +1,34 @@
 from pybit.unified_trading import HTTP
 import requests
+import time
+import hashlib
+import hmac
+
+
+def get_positions(api_key, api_secret, symbol):
+
+    url = 'https://api.bybit.com/v5/position/list'
+    params = {
+        'category': 'inverse',
+        'symbol': symbol
+    }
+
+    timestamp = str(int(time.time() * 1000))
+
+    pre_sign_str = f"{timestamp}{api_key}"
+
+    signature = hmac.new(api_secret.encode(), pre_sign_str.encode(), hashlib.sha256).hexdigest()
+
+    headers = {
+        'Content-Type': 'application/json',
+        'X-BYBIT-APIKEY': api_key,
+        'X-BYBIT-SIGN': signature,
+        'X-BYBIT-TIMESTAMP': timestamp
+    }
+
+    response = requests.get(url, headers=headers, params=params)
+
+    return response.json()
 
 
 def get_trading_pairs(symbol):
@@ -32,8 +61,8 @@ def check_session(api_key, api_secret):
 
 
 def main():
-    trading_pairs = get_trading_pairs('BTCUSDT')
-    print(trading_pairs)
+
+    print(get_positions("3RwoeutsTzx3lAeqWv", "QVjfIIUu35oG490lmRnzYdB0cRFLOGrWAYdK", "BTCUSDT"))
 
 
 if __name__ == '__main__':
