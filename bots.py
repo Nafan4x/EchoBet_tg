@@ -2,12 +2,50 @@ import data
 from telebot import types
 
 def add_bot(call, bot):
-    markup = types.InlineKeyboardMarkup(row_width=1)
-    item3 = types.InlineKeyboardButton("<Назад", callback_data='BACK_PROFILE_CALLBACK')
-    markup.add(item3)
-    bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
-                          text='Введите название бота', reply_markup=item3)
-    data.update_actions(call.message.chat.id, 'BOT_NAME_INSERT')
+    api_keys = None
+    try:
+        api_keys = data.get_editable_keys(chat_id=call.message.chat.id)
+    except:
+        pass
+    all_keys = data.read_table("keys")
+    user_keys = []
+    for i in all_keys:
+        for j in i:
+            if i[j] == call.message.chat.id:
+                user_keys.append(i)
+
+
+    if api_keys is None:
+        markup = types.InlineKeyboardMarkup(row_width=1)
+        item3 = types.InlineKeyboardButton("<Назад", callback_data='BACK_HOME_CALLBACK')
+        markup.add(item3)
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                              text='У вас нет API ключа. Добавьте его и вернитесь на эту страницу', reply_markup=markup)
+    else:
+        markup = types.InlineKeyboardMarkup(row_width=2)
+        key_names = []
+        for i in user_keys:
+           key_names.append(types.InlineKeyboardButton(f"{i['key_name']}", callback_data=f"{i['key_name']}"))
+
+        f = 0
+        for i in range(0, len(key_names) - 1, 2):
+            if len(key_names) % 2 == 0:
+                markup.add(key_names[i], key_names[i + 1], row_width=2)
+
+            else:
+                markup.add(key_names[i], key_names[i + 1], row_width=2)
+                f = 1
+        if f == 1:
+            markup.add(key_names[len(key_names) - 1])
+        if len(key_names) == 1:
+            markup.add(key_names[0], row_width=1)
+        item3 = types.InlineKeyboardButton("<Назад", callback_data='BACK_HOME_CALLBACK')
+        markup.row(item3)
+
+        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                              text='⬇️⬇️⬇️  Выберите API ключ для бота  ⬇️⬇️⬇️', reply_markup=markup)
+        data.update_actions(call.message.chat.id, 'BOT_NAME_INSERT')
+
 
 def add_api(call,bot):
     markup = types.InlineKeyboardMarkup(row_width=2)
@@ -71,5 +109,13 @@ def error_add_api(call, bot):
     #                  text='Введите Base-key Api', reply_markup=markup)
 
 
-
+if __name__ == "__main__":
+    all_keys = data.read_table("keys")
+    print(all_keys)
+    user_keys = []
+    for i in all_keys:
+        for j in i:
+            if i[j] == 8410512288:
+                user_keys.append(i)
+    print(user_keys)
 

@@ -97,6 +97,9 @@ def callback_inline(call):
         if call.data == "CANSEL_ADD_API":
             pass
 
+        #ADD BOTS
+        
+
         #ADD API
         if call.data == 'INSERT_BASE_API':
             bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text="Введите base-key")
@@ -119,7 +122,6 @@ def callback_inline(call):
             data.update_actions(chatid, "INSERT_BOURSE_API")
 
         if call.data == 'SAVE_API':
-
             values = data.get_editable_keys(chat_id=call.message.chat.id)
             for i in values:
                 print(i)
@@ -127,9 +129,11 @@ def callback_inline(call):
                     bots.error_add_api(call,bot)
                     return
             show_home(call, bot)
+
         if call.data == 'CANSEL_ADD_API':
             data.delete_record('keys', data.get_editable_keys(chat_id=call.message.chat.id)['key_id'])
             show_home(call, bot)
+
     except Exception as ex:
         print(ex)
 
