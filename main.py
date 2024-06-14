@@ -51,7 +51,7 @@ def welcome(message):
 def chater(message):
     chatid = str(message.chat.id)
     if message.chat.type == 'private':
-        profile.show_profile(chatid, bot)
+        if
 
 
 @bot.callback_query_handler(func=lambda call: True)

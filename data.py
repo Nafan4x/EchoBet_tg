@@ -339,6 +339,18 @@ def get_editable_keys(chat_id):
                 return i[0]
         return
 
+def get_actions(chat_id):
+    with conn.cursor() as curs:
+        select_query = """
+        SELECT action FROM tg_actions WHERE chat_id = %s
+        """
+        curs.execute(select_query, (chat_id,))
+        bot_ids = curs.fetchall()
+        for i in bot_ids:
+            if not None in i:
+                return i[0]
+        return
+
 
 def main():
     create_table()
@@ -349,3 +361,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
