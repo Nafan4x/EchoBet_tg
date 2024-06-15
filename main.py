@@ -98,7 +98,17 @@ def callback_inline(call):
             pass
 
         #ADD BOTS
-        
+            #choose api
+        api_id_calls = read_table('keys')
+        user_keys_id = []
+        for i in api_id_calls:
+            for j in i:
+                if i[j] == call.message.chat.id:
+                    user_keys_id.append(str(i['key_id']))
+        print(user_keys_id)
+        print(type(call.data))
+        if call.data in user_keys_id:
+            #Вызов функции добавления бота
 
         #ADD API
         if call.data == 'INSERT_BASE_API':

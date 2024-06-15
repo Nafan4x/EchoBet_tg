@@ -25,7 +25,7 @@ def add_bot(call, bot):
         markup = types.InlineKeyboardMarkup(row_width=2)
         key_names = []
         for i in user_keys:
-           key_names.append(types.InlineKeyboardButton(f"{i['key_name']}", callback_data=f"{i['key_name']}"))
+           key_names.append(types.InlineKeyboardButton(f"{i['key_name']}", callback_data=f"{i['key_id']}"))
 
         f = 0
         for i in range(0, len(key_names) - 1, 2):
@@ -95,27 +95,13 @@ def error_add_api(call, bot):
                      text='Это меню для добавления API в ваш аккаунт\n'
                           f'Введите все поля и нажмите кнопку "✅Сохранить"\n🔴Ошибка: Все поля должны быть заполнены', reply_markup=markup)
 
-
-
-
-
-
-    # data.update_actions(call.message.chat.id, 'API_NAME_INSERT')
-    #
-    # markup = types.InlineKeyboardMarkup(row_width=1)
-    # item3 = types.InlineKeyboardButton("❌Отмена", callback_data='CANSEL_ADD_API')
-    # markup.add(item3)
-    # bot.send_message(chat_id=call.message.chat.id,
-    #                  text='Введите Base-key Api', reply_markup=markup)
-
-
 if __name__ == "__main__":
     all_keys = data.read_table("keys")
     print(all_keys)
     user_keys = []
     for i in all_keys:
         for j in i:
-            if i[j] == 8410512288:
-                user_keys.append(i)
+            if i[j] == 841051288:
+                user_keys.append(i['key_id'])
     print(user_keys)
 
