@@ -3,32 +3,36 @@ import requests
 import time
 import hashlib
 import hmac
+import aiohttp
+import asyncio
 
 
-def get_positions(api_key, api_secret, symbol):
-
-    url = 'https://api.bybit.com/v5/position/list'
-    params = {
-        'category': 'inverse',
-        'symbol': symbol
-    }
-
+async def get_positions(api_key, api_secret, symbol, index, side):
     timestamp = str(int(time.time() * 1000))
+    recv_window = '5000'
+    queryString = f'category=linear&symbol={symbol}'
 
-    pre_sign_str = f"{timestamp}{api_key}"
+    param_str = f"{timestamp}{api_key}{recv_window}{queryString}"
 
-    signature = hmac.new(api_secret.encode(), pre_sign_str.encode(), hashlib.sha256).hexdigest()
+    sign = hmac.new(
+        bytes(api_secret, 'utf-8'),
+        bytes(param_str, 'utf-8'),
+        digestmod=hashlib.sha256
+    ).hexdigest()
+
+    url = f"https://api.bybit.com/v5/position/list?{queryString}"
 
     headers = {
-        'Content-Type': 'application/json',
-        'X-BYBIT-APIKEY': api_key,
-        'X-BYBIT-SIGN': signature,
-        'X-BYBIT-TIMESTAMP': timestamp
+        'X-BAPI-SIGN': sign,
+        'X-BAPI-API-KEY': api_key,
+        'X-BAPI-TIMESTAMP': timestamp,
+        'X-BAPI-RECV-WINDOW': recv_window,
     }
 
-    response = requests.get(url, headers=headers, params=params)
-
-    return response.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            response_data = await response.json()
+            return index, side, response_data['result']['list']
 
 
 def get_trading_pairs(symbol):
@@ -60,10 +64,18 @@ def check_session(api_key, api_secret):
         return False
 
 
-def main():
+async def main():
+    start_time = time.time()
+    api_key = "3RwoeutsTzx3lAeqWv"
+    api_secret = "QVjfIIUu35oG490lmRnzYdB0cRFLOGrWAYdK"
+    symbol = "1000PEPEUSDT"
 
-    print(get_positions("3RwoeutsTzx3lAeqWv", "QVjfIIUu35oG490lmRnzYdB0cRFLOGrWAYdK", "BTCUSDT"))
+    tasks = [get_positions(api_key, api_secret, symbol, _) for _ in range(50)]
+    for future in asyncio.as_completed(tasks):
+        index, result = await future
+        print(f"Response from task {index}: {result}")
 
+    print(time.time() - start_time, ' seconds')
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())

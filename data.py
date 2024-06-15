@@ -3,9 +3,9 @@ import psycopg2
 
 try:
     conn = psycopg2.connect(dbname='EchoData',
-                            user='postgres',
-                            password='123',
-                            host='localhost',
+                            user='mynewuser',
+                            password='mypassword',
+                            host='188.225.42.91',
                             )
 except Exception as exept:
     print(f'Can`t establish connection to database. {exept}')
@@ -404,12 +404,12 @@ def get_actions(chat_id):
 def main():
     create_table()
     # print(get_actions(234223123))
-    # create_bots(1, bot_name='Goga3', symbol='BTCUSDT', side='Buy', reinvestment=0, size=50, status='waiting')
+    for i in range(150):
+        create_bots(1, bot_name=f'Bot{50+i}', symbol='BTCUSDT', side='Buy', reinvestment=0, size=50, status='waiting')
     # print(get_active_bots())
-    print(get_editable_keys(234223123))
+    # print(get_editable_keys(234223123))
     conn.close()
 
 
 if __name__ == '__main__':
     main()
-
