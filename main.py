@@ -108,7 +108,8 @@ def callback_inline(call):
         print(user_keys_id)
         print(type(call.data))
         if call.data in user_keys_id:
-            #Вызов функции добавления бота
+        #Вызов функции добавления бота
+            pass
 
         #ADD API
         if call.data == 'INSERT_BASE_API':
