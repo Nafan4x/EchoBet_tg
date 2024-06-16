@@ -80,6 +80,28 @@ def chater(message):
             #bot.send_message(chat_id=chatid, text=f'✅bourse = {message.text}')
             bots.send_add_api(call=chatid, bot=bot)
 
+        # ADD BOT
+        if get_actions(chat_id=chatid) == "INSERT_NAME_BOT":
+            data.update_actions(message.chat.id, 'none')
+            data.update_bots(bot_id=get_editable_bots(chatid)['bot_id'], bot_name=str(message.text))
+            bots.send_add_bot(call=chatid, bot=bot)
+
+        if get_actions(chat_id=chatid) == "INSERT_SYMBOL_BOT":
+
+            data.update_bots(bot_id=get_editable_bots(chatid)['bot_id'], symbol=str(message.text))
+            bots.send_add_bot(call=chatid, bot=bot)
+            data.update_actions(message.chat.id, 'none')
+
+        if get_actions(chat_id=chatid) == "INSERT_SIZE_BOT":
+            print(config.is_int(str(message.text)))
+            if config.is_int(str(message.text)) == False:
+                bot.send_message(chat_id=chatid, text='Отправьте целое число')
+                return
+            data.update_actions(message.chat.id, 'none')
+            data.update_bots(bot_id=get_editable_bots(chatid)['bot_id'], size=str(message.text))
+            bots.send_add_bot(call=chatid, bot=bot)
+
+
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     chatid = str(call.message.chat.id)
@@ -93,9 +115,6 @@ def callback_inline(call):
         # Кнопки назад
         if call.data == 'BACK_HOME_CALLBACK':
             show_home(call, bot)
-        #Кнопки отмены добавления
-        if call.data == "CANSEL_ADD_API":
-            pass
 
         #ADD BOTS
             #choose api
@@ -105,11 +124,58 @@ def callback_inline(call):
             for j in i:
                 if i[j] == call.message.chat.id:
                     user_keys_id.append(str(i['key_id']))
-        print(user_keys_id)
-        print(type(call.data))
+        #print(user_keys_id)
+        #print(type(call.data))
         if call.data in user_keys_id:
         #Вызов функции добавления бота
-            pass
+            bots.create_bot_from_api(call,bot, call.data)
+
+        # ADD BOTS
+        if call.data == 'CANSEL_ADD_BOT':
+            print(data.get_editable_bots(chat_id=call.message.chat.id))
+            data.delete_record('bots', data.get_editable_bots(chat_id=call.message.chat.id)['bot_id'])
+
+            show_home(call, bot)
+
+        if call.data == 'INSERT_NAME_BOT':
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                  text="Введите название")
+            # bot.send_message(chat_id=chatid, text="Введите название")
+            data.update_actions(chatid, "INSERT_NAME_BOT")
+
+        if call.data == 'INSERT_SYMBOL_BOT':
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                  text="Введите валютную пару")
+            # bot.send_message(chat_id=chatid, text="Введите название")
+            data.update_actions(chatid, "INSERT_SYMBOL_BOT")
+
+        if call.data == 'INSERT_SIZE_BOT':
+            bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
+                                  text="Введите цену торговли")
+            # bot.send_message(chat_id=chatid, text="Введите название")
+            data.update_actions(chatid, "INSERT_SIZE_BOT")
+
+        if call.data == 'INSERT_REINV_BOT':
+            bots.choose_reinv(call,bot)
+        if call.data == 'УES_REINV_BOT':
+            data.update_bots(bot_id=get_editable_bots(chatid)['bot_id'], reinvestment=1)
+            data.update_actions(call.message.chat.id, 'none')
+            bots.create_bot_from_api(call,bot,create=False)
+        if call.data == 'NO_REINV_BOT':
+            data.update_bots(bot_id=get_editable_bots(chatid)['bot_id'], reinvestment=0)
+            data.update_actions(call.message.chat.id, 'none')
+            bots.create_bot_from_api(call,bot,create=False)
+
+        if call.data == 'INSERT_SIDE_BOT':
+            bots.choose_side(call, bot)
+        if call.data == 'SELL_SIDE_BOT':
+            data.update_bots(bot_id=get_editable_bots(chatid)['bot_id'], side='Sell')
+            data.update_actions(call.message.chat.id, 'none')
+            bots.create_bot_from_api(call,bot,create=False)
+        if call.data == 'BUY_SIDE_BOT':
+            data.update_bots(bot_id=get_editable_bots(chatid)['bot_id'], side='Buy')
+            data.update_actions(call.message.chat.id, 'none')
+            bots.create_bot_from_api(call,bot,create=False)
 
         #ADD API
         if call.data == 'INSERT_BASE_API':

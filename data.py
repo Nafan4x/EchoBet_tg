@@ -328,7 +328,7 @@ def get_editable_bots(chat_id):
             FROM Bots
             JOIN Keys ON Bots.key_id = Keys.key_id
             WHERE Keys.chat_id = %s
-            ORDER BY bit_id DESC
+            ORDER BY bot_id DESC
             LIMIT 1;
             """
             curs.execute(select_query, (chat_id,))
@@ -407,9 +407,10 @@ def main():
     #for i in range(150):
     #    create_bots(1, bot_name=f'Bot{50+i}', symbol='BTCUSDT', side='Buy', reinvestment=0, size=50, status='waiting')
     # print(get_active_bots())
-    # print(get_editable_keys(234223123))
+    #print(get_editable_bots(841051288))
     conn.close()
 
 
 if __name__ == '__main__':
     main()
+
