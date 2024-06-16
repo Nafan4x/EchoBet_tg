@@ -141,6 +141,10 @@ def update_bots(bot_id, bot_name=None, symbol=None, side=None, reinvestment=None
                 updates.append("size = %s")
                 params.append(size)
 
+            if status is not None:
+                updates.append("status = %s")
+                params.append(status)
+
             if not updates:
                 print("No fields to update")
                 return
@@ -371,7 +375,7 @@ def get_active_bots():
     try:
         with conn.cursor() as curs:
             select_query = """
-            SELECT bot_id, bot_name, symbol, side, reinvestment, size, status, base_key, secret_key FROM Bots
+            SELECT bot_id, bot_name, symbol, side, reinvestment, size, status, base_key, secret_key, bourse FROM Bots
             JOIN Keys ON Keys.key_id = Bots.key_id
             WHERE status = 'waiting';
             """
